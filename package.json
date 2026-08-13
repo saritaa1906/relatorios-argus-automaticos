@@ -1,0 +1,17 @@
+{
+  "name": "relatorios-argus-automaticos",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Gera relatorios de 14 dias das carteiras Argus e envia ao Google Drive.",
+  "scripts": {
+    "start": "node src/index.mjs",
+    "check": "node --check src/index.mjs && node --check src/report.mjs && node --check src/argus.mjs && node --check src/drive.mjs && node --check src/config.mjs",
+    "test": "node test/report.test.mjs"
+  },
+  "dependencies": {
+    "exceljs": "4.4.0",
+    "googleapis": "156.0.0",
+    "sharp": "0.34.3"
+  }
+}

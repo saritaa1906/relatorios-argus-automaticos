@@ -1,0 +1,55 @@
+name: Relatorios Argus apos 14 dias
+
+on:
+  schedule:
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Testar sem enviar ao Google Drive"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: relatorios-argus-diario
+  cancel-in-progress: false
+
+jobs:
+  gerar-relatorios:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      ARGUS_TOKEN: ${{ secrets.ARGUS_TOKEN }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+      GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
+      START_TRACKING_DATE: "2026-08-01"
+      TZ: America/Sao_Paulo
+      DRY_RUN: ${{ inputs.dry_run || false }}
+    steps:
+      - name: Baixar o projeto
+        uses: actions/checkout@v4
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Instalar dependencias
+        run: npm ci
+      - name: Validar codigo
+        run: npm run check
+      - name: Consultar Argus, gerar e enviar relatorios
+        run: npm start
+      - name: Guardar diagnostico se houver falha
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostico-relatorios-argus
+          path: logs/
+          if-no-files-found: ignore
+          retention-days: 7

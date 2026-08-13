@@ -1,0 +1,21 @@
+# Segredos e credenciais
+.env
+.env.*
+*.key
+*token*
+*credentials*.json
+
+# Dados pessoais e relatórios gerados
+outputs/
+tmp/
+data/
+*.xlsx
+*.csv
+*.json
+!package.json
+!package-lock.json
+
+# Node
+node_modules/
+npm-debug.log*
+
